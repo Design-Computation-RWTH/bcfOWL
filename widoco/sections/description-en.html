@@ -1,0 +1,79 @@
+<h2 id="desc" class="list">bcfOWL: Description <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<!-- DRAFT: restructured from the thesis chapter; check against thesis chapter -->
+
+<h3>Composition over translation</h3>
+<p>
+bcfOWL follows one delegation rule. A BCF concept is delegated to an existing vocabulary if an established
+vocabulary covers its meaning without a shift. It stays in bcfOWL if no such vocabulary exists, or if BCF adds
+conditions that the other vocabulary does not express.
+</p>
+
+<h3>Delegated concepts</h3>
+<p>
+bcfOWL reuses the following vocabularies. It uses their terms by IRI and does not import them.
+</p>
+<ul>
+<li><a href="https://www.dublincore.org/specifications/dublin-core/dcmi-terms/">Dublin Core Terms</a> (<code>dcterms:</code>):
+identity and creation</li>
+<li><a href="https://www.w3.org/TR/prov-o/">PROV-O</a> (<code>prov:</code>): agents and change history</li>
+<li><a href="https://www.w3.org/TR/vocab-ssn/">SOSA/SSN</a> (<code>sosa:</code>): cameras and observations</li>
+<li><a href="https://w3id.org/spot">SPOT</a> (<code>spot:</code>) and <a href="https://w3id.org/gom">GOM</a>
+(<code>gom:</code>): spaces, poses, and transformation matrices</li>
+<li><a href="https://www.w3.org/TR/vocab-dcat-3/">DCAT</a> (<code>dcat:</code>): snapshot images and bitmaps</li>
+<li><a href="https://www.w3.org/TR/skos-reference/">SKOS</a> (<code>skos:</code>): extension values and schemes</li>
+<li><a href="https://w3id.org/bot">BOT</a> (<code>bot:</code>): building elements</li>
+</ul>
+<p>The concepts are delegated as follows.</p>
+<ul>
+<li><b>Identity and metadata</b> (<a href="https://www.dublincore.org/specifications/dublin-core/dcmi-terms/">Dublin Core Terms</a>,
+<a href="https://www.w3.org/TR/prov-o/">PROV-O</a>): <code>dcterms:identifier</code> for BCF GUIDs,
+<code>dcterms:creator</code> and <code>dcterms:created</code> for creation. Authors, assignees, and project users are
+<code>prov:Agent</code>s, so a person, an organization, or a software agent can take these roles.</li>
+<li><b>Camera</b> (<a href="https://www.w3.org/TR/vocab-ssn/">SOSA</a>): a camera is a <code>sosa:Sensor</code>, and a
+capture or a model view is a <code>sosa:Observation</code>. <code>bcfOWL:hasPerspectiveCamera</code> and
+<code>bcfOWL:hasOrthogonalCamera</code> point to the observation. The property tells the projection mode.</li>
+<li><b>Pose</b> (<a href="https://w3id.org/spot">SPOT</a>, <a href="https://w3id.org/gom">GOM</a>): the position and
+direction of a capture is a <code>spot:PointSpace</code> that represents the observation
+(<code>spot:represents</code>). It is placed in the building with SPOT appearances and a GOM transformation matrix.</li>
+<li><b>Snapshot</b> (<a href="https://www.w3.org/TR/vocab-dcat-3/">DCAT</a>, <a href="https://www.w3.org/TR/vocab-ssn/">SOSA</a>):
+the image is a <code>dcat:Dataset</code> with a distribution, and also the <code>sosa:hasResult</code> of the
+observation. <code>bcfOWL:hasSnapshot</code> refers to the same resource.</li>
+<li><b>Building elements</b> (<a href="https://w3id.org/bot">BOT</a>): a Component refers to a
+<code>bot:Element</code> with <code>bcfOWL:hasElement</code>.</li>
+<li><b>Extensions</b> (<a href="https://www.w3.org/TR/skos-reference/">SKOS</a>): the project-specific values for status,
+type, priority, label, and stage are <code>skos:Concept</code>s in one <code>skos:ConceptScheme</code> per category. A
+<code>bcfOWL:ExtensionSchema</code> refers to these schemes.</li>
+<li><b>History</b> (<a href="https://www.w3.org/TR/prov-o/">PROV-O</a>): bcfOWL has no properties for change history.
+One possible pattern, with RDF 1.2 triple terms and PROV-O, is in the
+<a href="examples/04-provenance.ttl">examples</a>.</li>
+</ul>
+
+<h3>Format-specific core</h3>
+<p>
+The core contains the coordination concepts <code>bcfOWL:Project</code>, <code>bcfOWL:Topic</code>,
+<code>bcfOWL:Comment</code>, and <code>bcfOWL:Viewpoint</code>, and the visual state of a Viewpoint:
+selection, visibility and exceptions, components, coloring, lines, clipping planes, and bitmaps. The visual
+state contains instructions for a viewer, not statements about the building. bcfOWL therefore represents it
+directly, without more semantics.
+</p>
+
+<h3>Structural constraints</h3>
+<p>
+bcfOWL contains no cardinality restrictions. Under the open-world assumption, a missing title does not violate
+<code>owl:minCardinality 1</code>, and two status values are inferred to be the same individual. The BCF
+structure is a format requirement, not a statement about the world. It is therefore checked with the SHACL
+profile <a href="https://github.com/Design-Computation-RWTH/bcfOWL-shapes"><code>bcfOWL-shapes</code></a>.
+</p>
+
+<h3 id="examples" class="list">Examples</h3>
+<p>
+These Turtle files use the namespace <code>https://example.org/bcfowl-example#</code>. They build on each other.
+</p>
+<ul>
+<li><a href="examples/01-project.ttl">01-project.ttl</a>: a Project, its users, and its extension schema.</li>
+<li><a href="examples/02-topic-comment.ttl">02-topic-comment.ttl</a>: a clash Topic with a Comment.</li>
+<li><a href="examples/03-viewpoint.ttl">03-viewpoint.ttl</a>: a Viewpoint with its camera, pose, and rendered image,
+and with selected components, coloring, a visibility exception, a clipping plane, a line, and an orthogonal plan view.</li>
+<li><a href="examples/04-provenance.ttl">04-provenance.ttl</a>: the change history of a Topic with RDF 1.2 triple terms and
+PROV-O.</li>
+</ul>

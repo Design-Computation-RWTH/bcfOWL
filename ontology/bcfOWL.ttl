@@ -1,0 +1,465 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix bot: <https://w3id.org/bot#>.
+@prefix vann: <http://purl.org/vocab/vann/>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix dcat: <http://www.w3.org/ns/dcat#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix sosa: <http://www.w3.org/ns/sosa/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix schema: <http://schema.org/>.
+@prefix spot: <https://w3id.org/spot#>.
+@prefix bcfOWL: <https://w3id.org/bcfOWL#>.
+
+#### OWL Annotations ####
+dcterms:title a owl:AnnotationProperty.
+
+dcterms:description a owl:AnnotationProperty.
+dcterms:creator a owl:AnnotationProperty.
+dcterms:license a owl:AnnotationProperty.
+vann:preferredNamespacePrefix a owl:AnnotationProperty.
+vann:preferredNamespaceUri a owl:AnnotationProperty.
+dcterms:publisher a owl:AnnotationProperty.
+dcterms:issued a owl:AnnotationProperty.
+dcterms:modified a owl:AnnotationProperty.
+dcterms:abstract a owl:AnnotationProperty.
+dcterms:bibliographicCitation a owl:AnnotationProperty.
+<https://w3id.org/bcfOWL#> rdf:type owl:Ontology;
+  owl:versionInfo "1.0.0";
+  owl:versionIRI <https://w3id.org/bcfOWL/1.0.0>;
+  # The last published version, 0.7.1 (2022-03-16), uses the old namespace.
+  owl:priorVersion <http://lbd.arch.rwth-aachen.de/bcfOWL#>;
+  owl:incompatibleWith <http://lbd.arch.rwth-aachen.de/bcfOWL#>;
+  rdfs:seeAlso <https://lbd.arch.rwth-aachen.de/bcfOWL_V1/index-en.html>;
+  # External vocabularies (BOT, SOSA, SKOS, DCTERMS, PROV-O, DCAT, SPOT) are reused by
+  # IRI in axioms (subClassOf, subPropertyOf, domain, range) but are deliberately not
+  # owl:imported: bcfOWL needs none of their axioms, and an import would pull their
+  # whole closure into every consumer. schema:about appears only in an rdfs:comment.
+  dcterms:title "BIM Collaboration Format Ontology"@en;
+  rdfs:label "bcfOWL"@en;
+  dcterms:abstract """bcfOWL represents the BIM Collaboration Format (BCF) in RDF. It does not translate the BCF schema one to one. It composes BCF from established vocabularies (SOSA, SPOT, PROV-O, DCAT, SKOS, Dublin Core) and keeps only the coordination concepts that no other vocabulary covers, such as Topic, Comment, Viewpoint, and the visual state."""@en;
+  dcterms:description """bcfOWL covers the BCF concepts Project, Topic, Comment and Viewpoint, the project-specific extension values, and the visual state of a Viewpoint. Generic concerns are delegated to established vocabularies: identity and creation to Dublin Core Terms, cameras and observations to SOSA, poses to SPOT, images to DCAT, agents and change history to PROV-O, and extension values to SKOS. The structural rules of BCF are not OWL axioms. They are in the separate SHACL profile bcfOWL-shapes. The changes since the last published version, 0.7.1, are listed in CHANGELOG.md."""@en;
+  dcterms:creator [
+      a schema:Person ;
+      schema:name "Oliver Schulz" ;
+      schema:url "https://github.com/OlliSchu" ;
+      schema:affiliation _:dc
+  ];
+  dcterms:creator [ 
+    a schema:Person ;
+    schema:name "Jyrki Oraskari" ;
+    schema:url "https://github.com/jyrkioraskari" ;
+    schema:affiliation _:dc
+  ];
+  dcterms:creator [
+    a schema:Person ;
+    schema:name "Jakob Beetz" ;
+    schema:url "https://github.com/jakob-beetz" ;
+    schema:affiliation _:dc
+  ];
+  dcterms:publisher [ 
+    a schema:Person ;
+    schema:name "Jyrki Oraskari"
+  ];
+  dcterms:issued "2026-10-07"^^xsd:date;
+  dcterms:modified "2026-10-07"^^xsd:date;
+  dcterms:bibliographicCitation "Schulz, O., Oraskari, J., & Beetz, J. (2026). bcfOWL: BIM Collaboration Format Ontology (Version 1.0.0) [Ontology]. Design Computation, RWTH Aachen University. https://w3id.org/bcfOWL"@en;
+  dcterms:license <https://creativecommons.org/licenses/by/4.0/>;
+  vann:preferredNamespacePrefix "bcfOWL";
+  vann:preferredNamespaceUri <https://w3id.org/bcfOWL#>.
+
+_:dc a schema:Organization ;
+  schema:name "Design Computation, RWTH Aachen University" ;
+  schema:url "https://dc.rwth-aachen.de/" .
+
+bcfOWL:modifiedBy a owl:ObjectProperty;
+  rdfs:label "modified by"@en;
+  rdfs:comment "The agent of the latest modification (the BCF field ModifiedAuthor). A shortcut for the BCF round trip. The full history is in the provenance statements."@en;
+  rdfs:domain [
+    a owl:Class;
+    owl:unionOf ( bcfOWL:Topic bcfOWL:Comment );
+  ];
+  rdfs:range prov:Agent.
+
+bcfOWL:hasTopic a owl:ObjectProperty;
+  rdfs:label "has Topic"@en;
+  rdfs:comment "Link to the relating topic."@en;
+  rdfs:domain [
+    a owl:Class;
+    owl:unionOf ( bcfOWL:Viewpoint bcfOWL:Comment );
+  ];
+  rdfs:range bcfOWL:Topic.
+
+bcfOWL:hasProject a owl:ObjectProperty;
+  rdfs:label "has Project"@en;
+  rdfs:comment "Reference to the corresponding Project."@en;
+  rdfs:domain [
+    a owl:Class;
+    owl:unionOf ( bcfOWL:Viewpoint bcfOWL:Comment bcfOWL:Topic );
+  ];
+  rdfs:range bcfOWL:Project.
+
+bcfOWL:Project a owl:Class;
+  rdfs:label "Project"@en;
+  rdfs:comment "The project contains reference information about the project the topics belong to. It refers to the extension schema."@en.
+
+bcfOWL:referenceSpace a owl:ObjectProperty;
+  rdfs:label "reference space"@en;
+  rdfs:comment "The spot:AssetSpace in which BCF API coordinates for this Project are exposed and accepted."@en;
+  rdfs:domain bcfOWL:Project;
+  rdfs:range spot:AssetSpace.
+
+bcfOWL:hasExtensionSchema a owl:ObjectProperty;
+  rdfs:label "has Extension Schema"@en;
+  rdfs:comment "URI to the extension schema."@en;
+  rdfs:domain bcfOWL:Project;
+  rdfs:range bcfOWL:ExtensionSchema.
+
+bcfOWL:ExtensionSchema a owl:Class;
+  rdfs:label "Extension Schema"@en;
+  rdfs:comment "The extension schema defines the allowed values of a BCF project: one skos:ConceptScheme each for type, status, label, priority and stage. A value belongs to its scheme with skos:inScheme."@en.
+
+bcfOWL:TopicType a owl:Class;
+  rdfs:subClassOf skos:Concept;
+  rdfs:label "Topic Type"@en;
+  rdfs:comment "Use case of a BCF issue, e.g. Information Request, Defect."@en.
+
+bcfOWL:TopicStatus a owl:Class;
+  rdfs:subClassOf skos:Concept;
+  rdfs:label "Topic Status"@en;
+  rdfs:comment "Status of the issue, e.g. Open, In Progress, Closed."@en.
+
+bcfOWL:Label a owl:Class;
+  rdfs:subClassOf skos:Concept;
+  rdfs:label "Label"@en;
+  rdfs:comment "Tag for categorizing issues."@en.
+
+bcfOWL:Priority a owl:Class;
+  rdfs:subClassOf skos:Concept;
+  rdfs:label "Priority"@en;
+  rdfs:comment "Indication of the priority of an issue."@en.
+
+bcfOWL:Stage a owl:Class;
+  rdfs:subClassOf skos:Concept;
+  rdfs:label "Stage"@en;
+  rdfs:comment "Project stage this topic relates to."@en.
+
+bcfOWL:hasTypeScheme a owl:ObjectProperty;
+  rdfs:label "has Type Scheme"@en;
+  rdfs:comment "The project's scheme of allowed TopicType values."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range skos:ConceptScheme.
+
+bcfOWL:hasStatusScheme a owl:ObjectProperty;
+  rdfs:label "has Status Scheme"@en;
+  rdfs:comment "The project's scheme of allowed TopicStatus values."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range skos:ConceptScheme.
+
+bcfOWL:hasLabelScheme a owl:ObjectProperty;
+  rdfs:label "has Label Scheme"@en;
+  rdfs:comment "The project's scheme of allowed Label values."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range skos:ConceptScheme.
+
+bcfOWL:hasPriorityScheme a owl:ObjectProperty;
+  rdfs:label "has Priority Scheme"@en;
+  rdfs:comment "The project's scheme of allowed Priority values."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range skos:ConceptScheme.
+
+bcfOWL:hasStageScheme a owl:ObjectProperty;
+  rdfs:label "has Stage Scheme"@en;
+  rdfs:comment "The project's scheme of allowed Stage values."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range skos:ConceptScheme.
+
+bcfOWL:hasTopicType a owl:ObjectProperty;
+  rdfs:label "has Topic Type"@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range bcfOWL:TopicType.
+
+bcfOWL:hasTopicStatus a owl:ObjectProperty;
+  rdfs:label "has Topic Status"@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range bcfOWL:TopicStatus.
+
+bcfOWL:hasLabels a owl:ObjectProperty;
+  rdfs:label "has Label"@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range bcfOWL:Label.
+
+bcfOWL:hasPriority a owl:ObjectProperty;
+  rdfs:label "has Priority"@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range bcfOWL:Priority.
+
+bcfOWL:hasStage a owl:ObjectProperty;
+  rdfs:label "has Stage"@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range bcfOWL:Stage.
+
+bcfOWL:hasUser a owl:ObjectProperty;
+  rdfs:label "has User"@en;
+  rdfs:comment "An agent valid in this project; the BCF 3.0 'users' list from which creators and assignees are drawn."@en;
+  rdfs:domain bcfOWL:ExtensionSchema;
+  rdfs:range prov:Agent.
+
+bcfOWL:Topic a owl:Class;
+  rdfs:label "Topic"@en;
+  rdfs:comment "Contains the reference information of a topic (a BCF issue). The BCF GUID is its dcterms:identifier."@en.
+
+bcfOWL:hasIndex a owl:DatatypeProperty;
+  rdfs:label "has Index"@en;
+  rdfs:comment "Optional number used to maintain the order of Topics or Viewpoints."@en;
+  rdfs:domain [
+    a owl:Class;
+    owl:unionOf ( bcfOWL:Topic bcfOWL:Viewpoint );
+  ];
+  rdfs:range xsd:integer.
+
+bcfOWL:hasAssignedTo a owl:ObjectProperty;
+  rdfs:label "has Assigned To"@en;
+  rdfs:comment "The agent to whom this topic is assigned, expected to be one of the project's hasUser agents. A forward-looking responsibility, not provenance."@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range prov:Agent.
+
+bcfOWL:hasDueDate a owl:DatatypeProperty;
+  rdfs:label "has Due Date"@en;
+  rdfs:comment "Date until when the topic's issue needs to be resolved."@en;
+  rdfs:domain bcfOWL:Topic;
+  rdfs:range xsd:dateTime.
+
+bcfOWL:hasReferenceLink a owl:ObjectProperty ;
+  rdfs:label "has reference link"@en ;
+  rdfs:comment "A resource listed in the BCF reference_links field of the topic. It can be any IRI, for example a document or a building element. The role of the target can be stated with a more precise predicate such as schema:about."@en ;
+  rdfs:domain bcfOWL:Topic ;
+  rdfs:range rdfs:Resource .
+
+bcfOWL:Comment a owl:Class;
+  rdfs:label "Comment"@en;
+  rdfs:comment "A comment related to a topic. Its purpose is to record discussion between different parties related to the topic."@en.
+
+bcfOWL:hasCommentText a owl:DatatypeProperty;
+  rdfs:label "has Comment Text"@en;
+  rdfs:comment "The comment text. Mutable; history is statement-level."@en;
+  rdfs:domain bcfOWL:Comment;
+  rdfs:range xsd:string.
+
+bcfOWL:hasViewpoint a owl:ObjectProperty;
+  rdfs:label "has Viewpoint"@en;
+  rdfs:comment "Reference to the viewpoint this comment relates to."@en;
+  rdfs:domain bcfOWL:Comment;
+  rdfs:range bcfOWL:Viewpoint.
+
+bcfOWL:Viewpoint a owl:Class;
+  rdfs:label "Viewpoint"@en;
+  rdfs:comment """A viewpoint belongs to a topic and can be referred to by comments. It refers to the camera (a sosa:Observation) and carries the visual state: selection, visibility, coloring, clipping planes, lines and bitmaps. A viewpoint does not change after creation.The coordinates of the visual state are in the space given by spot:appearsIn of the camera pose. See the change log for the camera frame."""@en.
+
+bcfOWL:hasPerspectiveCamera a owl:ObjectProperty;
+  rdfs:label "has Perspective Camera"@en;
+  rdfs:comment "References the sosa:Observation captured with a perspective projection. Requires bcfOWL:hasFieldOfView and bcfOWL:hasAspectRatio on the observation for a lossless BCF 3.0 round-trip."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range sosa:Observation;
+  owl:propertyDisjointWith bcfOWL:hasOrthogonalCamera.
+
+bcfOWL:hasOrthogonalCamera a owl:ObjectProperty;
+  rdfs:label "has Orthogonal Camera"@en;
+  rdfs:comment "References the sosa:Observation captured with an orthogonal projection. Requires bcfOWL:hasViewToWorldScale and bcfOWL:hasAspectRatio on the observation for a lossless BCF 3.0 round-trip."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range sosa:Observation.
+
+bcfOWL:hasFieldOfView a owl:DatatypeProperty;
+  rdfs:label "has Field of View"@en;
+  rdfs:comment "Camera field of view angle in degrees, for a perspective observation."@en;
+  rdfs:domain sosa:Observation;
+  rdfs:range xsd:double.
+
+bcfOWL:hasViewToWorldScale a owl:DatatypeProperty;
+  rdfs:label "has View To World Scale"@en;
+  rdfs:comment "Proportion of view to model, for an orthogonal observation."@en;
+  rdfs:domain sosa:Observation;
+  rdfs:range xsd:double.
+
+bcfOWL:hasAspectRatio a owl:DatatypeProperty;
+  rdfs:label "has Aspect Ratio"@en;
+  rdfs:comment "Width-to-height ratio of the perspective or orthogonal camera observation."@en;
+  rdfs:domain sosa:Observation;
+  rdfs:range xsd:double.
+
+bcfOWL:hasSnapshot a owl:ObjectProperty;
+  rdfs:label "has Snapshot"@en;
+  rdfs:comment "Optional denormalized shortcut to the snapshot image for BCF serialization. The same media is otherwise the referenced observation's sosa:hasResult."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range dcat:Dataset.
+
+bcfOWL:hasDefaultVisibility a owl:DatatypeProperty;
+  rdfs:label "has Default Visibility"@en;
+  rdfs:comment "Default visibility state before view-setup hints and visibility exceptions are applied."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range xsd:boolean.
+
+bcfOWL:spacesVisible a owl:DatatypeProperty;
+  rdfs:label "spaces Visible"@en;
+  rdfs:comment "Explicit view-setup override for spatial components, applied after default visibility."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range xsd:boolean.
+
+bcfOWL:spaceBoundariesVisible a owl:DatatypeProperty;
+  rdfs:label "space Boundaries Visible"@en;
+  rdfs:comment "Explicit view-setup override for space-boundary components, applied after default visibility."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range xsd:boolean.
+
+bcfOWL:openingsVisible a owl:DatatypeProperty;
+  rdfs:label "openings Visible"@en;
+  rdfs:comment "Explicit view-setup override for opening components, applied after default visibility."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range xsd:boolean.
+
+bcfOWL:Component a owl:Class;
+  rdfs:label "Component"@en;
+  rdfs:comment "Stable BCF component descriptor linking to a building element and retaining round-trip identifiers."@en.
+
+bcfOWL:hasComponent a owl:ObjectProperty;
+  rdfs:label "has Component"@en;
+  rdfs:comment "Component included in a Coloring resource."@en;
+  rdfs:domain bcfOWL:Coloring;
+  rdfs:range bcfOWL:Component.
+
+bcfOWL:hasSelectedComponent a owl:ObjectProperty;
+  rdfs:label "has Selected Component"@en;
+  rdfs:comment "A component selected in this viewpoint; repeated statements represent the BCF selection array."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:Component.
+
+bcfOWL:hasVisibilityException a owl:ObjectProperty;
+  rdfs:label "has Visibility Exception"@en;
+  rdfs:comment "A component whose visibility is inverted after defaults and view-setup hints are applied."@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:Component.
+
+bcfOWL:hasIfcGuid a owl:DatatypeProperty;
+  rdfs:subPropertyOf dcterms:identifier;
+  rdfs:label "has Ifc Guid"@en;
+  rdfs:comment "The IFC GUID of the component, used as a fallback when no linked data URI is available."@en;
+  rdfs:domain bcfOWL:Component;
+  rdfs:range xsd:string.
+
+bcfOWL:hasElement a owl:ObjectProperty;
+  rdfs:label "has Element"@en;
+  rdfs:comment "Linked data reference to the building element."@en;
+  rdfs:domain bcfOWL:Component;
+  rdfs:range bot:Element.
+
+bcfOWL:hasAuthoringToolId a owl:DatatypeProperty;
+  rdfs:subPropertyOf dcterms:identifier;
+  rdfs:label "has Authoring Tool Id"@en;
+  rdfs:domain bcfOWL:Component;
+  rdfs:range xsd:string.
+
+bcfOWL:hasOriginatingSystem a owl:ObjectProperty;
+  rdfs:label "has Originating System"@en;
+  rdfs:domain bcfOWL:Component;
+  rdfs:range bcfOWL:OriginatingSystem.
+
+bcfOWL:OriginatingSystem a owl:Class;
+  rdfs:label "Originating System"@en;
+  rdfs:comment "Software with which the respective element was created."@en.
+
+bcfOWL:point3D a rdfs:Datatype;
+  rdfs:label "3D point"@en;
+  rdfs:comment "A canonical JSON-style array of exactly three finite decimal numbers [X,Y,Z], representing a position in metres in the viewpoint's immediate SPOT context space."@en.
+
+bcfOWL:vector3D a rdfs:Datatype;
+  rdfs:label "3D vector"@en;
+  rdfs:comment "A canonical JSON-style array of exactly three finite decimal numbers [X,Y,Z], representing a non-zero dimensionless direction in the viewpoint's immediate SPOT context space. Applications normalize it where BCF requires a unit vector."@en.
+
+bcfOWL:Bitmap a owl:Class;
+  rdfs:label "Bitmap"@en;
+  rdfs:comment "Viewpoint-internal placement of an externally represented bitmap image."@en.
+
+bcfOWL:ClippingPlane a owl:Class;
+  rdfs:label "Clipping Plane"@en;
+  rdfs:comment "Viewpoint-internal blank-node markup defining a plane by a location and a direction toward the clipped half-space."@en.
+
+bcfOWL:Line a owl:Class;
+  rdfs:label "Line"@en;
+  rdfs:comment "Viewpoint-internal blank-node markup defined by start and end points; equal endpoints represent point-like markup."@en.
+
+bcfOWL:Coloring a owl:Class;
+  rdfs:label "Coloring"@en;
+  rdfs:comment "Viewpoint-internal blank-node relation mapping an RGB or ARGB color to one or more Components."@en.
+
+bcfOWL:hasBitmap a owl:ObjectProperty;
+  rdfs:label "has Bitmap"@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:Bitmap.
+
+bcfOWL:hasClippingPlane a owl:ObjectProperty;
+  rdfs:label "has Clipping Plane"@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:ClippingPlane.
+
+bcfOWL:hasLine a owl:ObjectProperty;
+  rdfs:label "has Line"@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:Line.
+
+bcfOWL:hasColoring a owl:ObjectProperty;
+  rdfs:label "has Coloring"@en;
+  rdfs:domain bcfOWL:Viewpoint;
+  rdfs:range bcfOWL:Coloring.
+
+bcfOWL:hasColor a owl:DatatypeProperty;
+  rdfs:label "has Color"@en;
+  rdfs:comment "Six-digit RGB or eight-digit ARGB hexadecimal color as defined by BCF."@en;
+  rdfs:domain bcfOWL:Coloring;
+  rdfs:range xsd:string.
+
+bcfOWL:hasStartPoint a owl:DatatypeProperty;
+  rdfs:label "has Start Point"@en;
+  rdfs:domain bcfOWL:Line;
+  rdfs:range bcfOWL:point3D.
+
+bcfOWL:hasEndPoint a owl:DatatypeProperty;
+  rdfs:label "has End Point"@en;
+  rdfs:domain bcfOWL:Line;
+  rdfs:range bcfOWL:point3D.
+
+bcfOWL:hasLocation a owl:DatatypeProperty;
+  rdfs:label "has Location"@en;
+  rdfs:domain [
+    a owl:Class;
+    owl:unionOf ( bcfOWL:ClippingPlane bcfOWL:Bitmap );
+  ];
+  rdfs:range bcfOWL:point3D.
+
+bcfOWL:hasDirection a owl:DatatypeProperty;
+  rdfs:label "has Direction"@en;
+  rdfs:domain bcfOWL:ClippingPlane;
+  rdfs:range bcfOWL:vector3D.
+
+bcfOWL:hasBitmapImage a owl:ObjectProperty;
+  rdfs:label "has Bitmap Image"@en;
+  rdfs:comment "External binary image represented as a DCAT Dataset with a Distribution."@en;
+  rdfs:domain bcfOWL:Bitmap;
+  rdfs:range dcat:Dataset.
+
+bcfOWL:hasNormal a owl:DatatypeProperty;
+  rdfs:label "has Normal"@en;
+  rdfs:domain bcfOWL:Bitmap;
+  rdfs:range bcfOWL:vector3D.
+
+bcfOWL:hasUpVector a owl:DatatypeProperty;
+  rdfs:label "has Up Vector"@en;
+  rdfs:domain bcfOWL:Bitmap;
+  rdfs:range bcfOWL:vector3D.
+
+bcfOWL:hasHeight a owl:DatatypeProperty;
+  rdfs:label "has Height"@en;
+  rdfs:comment "Bitmap height in metres."@en;
+  rdfs:domain bcfOWL:Bitmap;
+  rdfs:range xsd:double.

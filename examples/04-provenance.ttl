@@ -1,0 +1,62 @@
+# Example 4: change history of a Topic (the statement-level provenance pattern).
+# The current value is asserted directly. Earlier values stay available as
+# reified triple terms, with PROV-O activities that say who changed what and when.
+# This is the same information as a BCF event service log.
+# Uses RDF 1.2 triple-term syntax. The topic is from 02-topic-comment.ttl.
+
+@prefix bcfOWL: <https://w3id.org/bcfOWL#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:     <https://example.org/bcfowl-example#> .
+
+# CURRENT STATE: the Topic is resolved. The unqualified shortcut names the last editor.
+ex:topic1
+  bcfOWL:hasTopicStatus ex:status_resolved;
+  bcfOWL:modifiedBy ex:mep_engineer.
+
+# CHANGES
+ex:change1 a prov:Activity;
+  rdfs:label "Topic created by the clash detection run"@en;
+  prov:endedAtTime "2026-03-12T09:05:00Z"^^xsd:dateTime;
+  prov:wasAssociatedWith ex:clash_detector.
+
+ex:change2 a prov:Activity;
+  rdfs:label "Status changed to In progress"@en;
+  prov:endedAtTime "2026-03-13T08:30:00Z"^^xsd:dateTime;
+  prov:wasAssociatedWith ex:mep_engineer.
+
+ex:change3 a prov:Activity;
+  rdfs:label "Status changed to Resolved"@en;
+  prov:endedAtTime "2026-03-20T16:10:00Z"^^xsd:dateTime;
+  prov:wasAssociatedWith ex:mep_engineer.
+
+# STATUS HISTORY: one reified statement per value, linked as a revision chain.
+ex:statusAssertion1 a prov:Entity;
+  rdf:reifies <<( ex:topic1 bcfOWL:hasTopicStatus ex:status_open )>>;
+  prov:wasGeneratedBy ex:change1;
+  prov:wasInvalidatedBy ex:change2.
+
+ex:statusAssertion2 a prov:Entity;
+  rdf:reifies <<( ex:topic1 bcfOWL:hasTopicStatus ex:status_in_progress )>>;
+  prov:wasGeneratedBy ex:change2;
+  prov:wasRevisionOf ex:statusAssertion1;
+  prov:wasInvalidatedBy ex:change3.
+
+ex:statusAssertion3 a prov:Entity;
+  rdf:reifies <<( ex:topic1 bcfOWL:hasTopicStatus ex:status_resolved )>>;
+  prov:wasGeneratedBy ex:change3;
+  prov:wasRevisionOf ex:statusAssertion2.
+
+# The same pattern applies to any other mutable value, for example the title:
+ex:titleAssertion1 a prov:Entity;
+  rdf:reifies <<( ex:topic1 <http://purl.org/dc/terms/title> "Duct D-204 clashes with beam B-117 on level 2" )>>;
+  prov:wasGeneratedBy ex:change1.
+
+# QUERY (SPARQL 1.2): the status the Topic had before it was resolved.
+#
+#   SELECT ?status WHERE {
+#     ?a rdf:reifies <<( ex:topic1 bcfOWL:hasTopicStatus ?status )>> ;
+#        prov:wasInvalidatedBy ex:change3 .
+#   }

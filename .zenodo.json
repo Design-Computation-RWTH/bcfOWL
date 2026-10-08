@@ -1,0 +1,50 @@
+{
+  "title": "bcfOWL: BIM Collaboration Format Ontology",
+  "description": "bcfOWL represents the BIM Collaboration Format (BCF) in RDF. It does not translate the BCF schema one to one. It composes BCF from established vocabularies (SOSA, SPOT, PROV-O, DCAT, SKOS, Dublin Core) and keeps only the coordination concepts that no other vocabulary covers, such as Topic, Comment, Viewpoint, and the visual state. Version 1.0.0 moves the ontology to the persistent namespace https://w3id.org/bcfOWL#.",
+  "version": "1.0.0",
+  "upload_type": "dataset",
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "creators": [
+    {
+      "name": "Schulz, Oliver",
+      "affiliation": "Design Computation, RWTH Aachen University"
+    },
+    {
+      "name": "Oraskari, Jyrki",
+      "affiliation": "Design Computation, RWTH Aachen University"
+    },
+    {
+      "name": "Beetz, Jakob",
+      "affiliation": "Design Computation, RWTH Aachen University"
+    }
+  ],
+  "keywords": [
+    "ontology",
+    "Linked Building Data",
+    "BCF",
+    "BIM Collaboration Format",
+    "issue management",
+    "SOSA",
+    "SPOT",
+    "BIM",
+    "semantic web"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://w3id.org/bcfOWL",
+      "relation": "isIdenticalTo",
+      "resource_type": "dataset"
+    },
+    {
+      "identifier": "10.5281/zenodo.4710742",
+      "relation": "isNewVersionOf",
+      "resource_type": "dataset"
+    },
+    {
+      "identifier": "https://w3id.org/spot/",
+      "relation": "references",
+      "resource_type": "dataset"
+    }
+  ]
+}

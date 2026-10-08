@@ -1,0 +1,45 @@
+# Example 2: a clash Topic with a Comment.
+# A ventilation duct (MEP model) crosses a steel beam (structural model) on level 2.
+# The Topic carries the current values. The Comment refers to the Viewpoint that
+# is described in 03-viewpoint.ttl. The project, users and extension schema are
+# from 01-project.ttl.
+
+@prefix bcfOWL:  <https://w3id.org/bcfOWL#> .
+@prefix bot:     <https://w3id.org/bot#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <http://schema.org/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:      <https://example.org/bcfowl-example#> .
+
+ex:topic1 a bcfOWL:Topic;
+  bcfOWL:hasProject ex:project;
+  dcterms:identifier "5a52cbe2-edd7-41d8-b610-fab29397cc74";
+  dcterms:title "Duct D-204 clashes with beam B-117 on level 2";
+  dcterms:description "The supply air duct passes through the flange of the steel beam. Clearance is negative by about 80 mm.";
+  dcterms:creator ex:clash_detector;
+  dcterms:created "2026-03-12T09:05:00Z"^^xsd:dateTime;
+  bcfOWL:hasTopicType ex:type_clash;
+  bcfOWL:hasTopicStatus ex:status_open;
+  bcfOWL:hasPriority ex:priority_high;
+  bcfOWL:hasStage ex:stage_detailed_design;
+  bcfOWL:hasLabels ex:label_mep, ex:label_structure;
+  bcfOWL:hasAssignedTo ex:mep_engineer;
+  bcfOWL:hasDueDate "2026-03-27T00:00:00Z"^^xsd:dateTime;
+  # The BCF reference_links field. More precise relations may be added next to it.
+  bcfOWL:hasReferenceLink ex:duct_d204, ex:beam_b117;
+  schema:about ex:duct_d204, ex:beam_b117.
+
+ex:duct_d204 a bot:Element;
+  dcterms:title "Supply air duct D-204".
+
+ex:beam_b117 a bot:Element;
+  dcterms:title "Steel beam B-117".
+
+ex:comment1 a bcfOWL:Comment;
+  bcfOWL:hasProject ex:project;
+  bcfOWL:hasTopic ex:topic1;
+  bcfOWL:hasViewpoint ex:viewpoint1;
+  dcterms:identifier "1a37f501-a647-4092-afd7-c410bc84ae1d";
+  dcterms:creator ex:structural_engineer;
+  dcterms:created "2026-03-12T10:20:00Z"^^xsd:dateTime;
+  bcfOWL:hasCommentText "The beam size is fixed by the load calculation. Please reroute the duct below the beam.".

@@ -1,0 +1,4 @@
+.DS_Store
+docs/
+.cache/
+tmp[0-9]*/

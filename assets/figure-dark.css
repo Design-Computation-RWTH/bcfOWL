@@ -1,0 +1,2 @@
+/* Dark mode only: invert lightness of transparent figures, keep hues */
+img.invert-in-dark { filter: invert(1) hue-rotate(180deg); }
