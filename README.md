@@ -69,6 +69,7 @@ A documentation change appears on the latest page (`https://w3id.org/bcfOWL`) af
    git tag vX.Y.Z
    git push origin vX.Y.Z
    ```
+   Do not create the release in the GitHub web UI. That creates the release before the checks run, so a wrong version is released anyway.
 3. The `release` workflow checks the tag. The ontology must declare exactly version `X.Y.Z`, `owl:priorVersion` must be the previous release, and `CHANGELOG.md` must have a section for `X.Y.Z`. If a check fails, no release is created. Delete the tag (`git push --delete origin vX.Y.Z && git tag -d vX.Y.Z`), fix the problem, and tag again.
 4. If the checks pass, the workflow creates the GitHub release, with the `CHANGELOG.md` section as release notes. With the Zenodo GitHub integration enabled, Zenodo archives the release and assigns a DOI (metadata from `.zenodo.json`).
 5. Then the workflow starts the `docs` workflow on `main`. It publishes the documentation of the release, and `https://w3id.org/bcfOWL/X.Y.Z` resolves.

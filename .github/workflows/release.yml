@@ -39,6 +39,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # A release created in the GitHub web UI already exists: keep it.
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "::notice::Release $GITHUB_REF_NAME already exists. Not creating it again."
+            exit 0
+          fi
           version="${GITHUB_REF_NAME#v}"
           # Release notes: the section of this version in CHANGELOG.md
           awk -v v="$version" '$0 ~ "^## " v "( |$)" {on=1; next} on && /^## / {exit} on' CHANGELOG.md > notes.md
