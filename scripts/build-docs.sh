@@ -32,6 +32,7 @@ java -jar "$JAR" \
 test -s "$OUT/index-en.html" || { echo "Widoco produced no index-en.html" >&2; exit 1; }
 
 # Widoco has no option for custom acknowledgments: insert ours at the top of that section.
+# Also add the "Latest version" link (see below).
 python3 - "$OUT/index-en.html" widoco/sections/acknowledgments-en.html <<'PY'
 import re, sys
 page, extra = sys.argv[1], open(sys.argv[2], encoding="utf-8").read()
@@ -39,6 +40,12 @@ html = open(page, encoding="utf-8").read()
 html, n = re.subn(r'(<div id="acknowledgments">\s*<h2[^>]*>.*?</h2>)', lambda m: m.group(1) + "\n" + extra, html, count=1, flags=re.S)
 if n != 1:
     sys.exit("Acknowledgments section not found in " + page)
+# -getOntologyMetadata discards latestVersionURI from the config file. Insert the
+# "Latest version" link ourselves, so that archived versions point to the current one.
+latest = "https://w3id.org/bcfOWL"
+html, n = re.subn(r'(<dt>This version:</dt>\s*<dd>.*?</dd>)', lambda m: m.group(1) + f'\n<dt>Latest version:</dt>\n<dd><a href="{latest}">{latest}</a></dd>', html, count=1, flags=re.S)
+if n != 1:
+    sys.exit("'This version' entry not found in " + page)
 open(page, "w", encoding="utf-8").write(html)
 PY
 

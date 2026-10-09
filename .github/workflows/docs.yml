@@ -18,11 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all release tags, for build-versions.sh
 
       - name: Check Turtle syntax
         run: |
           pip install --quiet rdflib
           python -c "import rdflib; g = rdflib.Graph().parse('ontology/bcfOWL.ttl'); print(len(g), 'triples')"
+
+      # Fails if the ontology changed since the last release but its version did not.
+      - name: Check ontology version
+        run: python scripts/check-version.py
 
       - uses: actions/setup-java@v4
         with:
@@ -33,9 +39,13 @@ jobs:
         with:
           path: .cache
           key: widoco-${{ hashFiles('scripts/build-docs.sh') }}
+          restore-keys: widoco-
 
       - name: Build documentation
         run: bash scripts/build-docs.sh
+
+      - name: Build released versions
+        run: bash scripts/build-versions.sh
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,51 @@
+name: release
+
+# Push a tag vX.Y.Z to release that version. The release is created only if the
+# ontology declares exactly that version and the documentation builds.
+# Then the docs workflow is started on main, which publishes the documentation
+# of the release at docs/<version>/.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the release
+  actions: write  # start the docs workflow
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all release tags, for the priorVersion check
+
+      - name: Check ontology version
+        run: |
+          pip install --quiet rdflib
+          python scripts/check-version.py --tag "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build documentation
+        run: bash scripts/build-docs.sh
+
+      # Zenodo archives the GitHub release and assigns a DOI.
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # Release notes: the section of this version in CHANGELOG.md
+          awk -v v="$version" '$0 ~ "^## " v "( |$)" {on=1; next} on && /^## / {exit} on' CHANGELOG.md > notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "bcfOWL $version" --notes-file notes.md
+
+      # A tag push does not start the docs workflow, so start it here.
+      - name: Deploy documentation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docs.yml --ref main
